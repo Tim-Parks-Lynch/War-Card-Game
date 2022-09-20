@@ -117,24 +117,79 @@ class Player:
         return f"Player {self.name} has {len(self.all_cards)} cards."
 
 
-# Game Logic
+# Game Setup
 
+# Create new players
+player_one = Player("One")
+player_two = Player("Two")
 
+# Shuffle Deck
 new_deck = Deck()
 new_deck.shuffle_deck()
-mycard = new_deck.deal_one()
 
-player_1 = Player("Jose")
-player_1.add_cards(mycard)
-player_1.add_cards([mycard, mycard, mycard])
-print(player_1.all_cards[0])
-player_1.remove_one()
-print(player_1.all_cards[1])
-print(player_1)
+# Give cards to players
+for x in range(26):
+    player_one.add_cards(new_deck.deal_one())
+    player_two.add_cards(new_deck.deal_one())
 
-# print("my card here: ", mycard)
-# for card_object in new_deck.all_cards:
-#     print(card_object)
-# print(len(new_deck.all_cards))
+# Start Game
+game_on = True
 
-# Game Logic
+# While game_on
+
+round_num = 0
+while game_on:
+    round_num += 1
+
+    print(f"Round {round_num}")
+
+    if len(player_one.all_cards) == 0:
+        print("Player One, out of cards! Player Two Wins!")
+        game_on = False
+        break
+
+    if len(player_two.all_cards) == 0:
+        print("Player Two, out of cards! Player One Wins!")
+        game_on = False
+        break
+
+    # Start a new round
+    player_one_cards = []  # current cards in play on the table
+    player_one_cards.append(player_one.remove_one())
+
+    player_two_cards = []  # current cards in play on the table
+    player_two_cards.append(player_two.remove_one())
+
+    # While at_war
+    at_war = True
+
+    while at_war:
+        if player_one_cards[-1].value > player_two_cards[-1].value:
+            player_one.add_cards(player_one_cards)
+            player_one.add_cards(player_two_cards)
+            at_war = False
+
+        elif player_one_cards[-1].value < player_two_cards[-1].value:
+            player_two.add_cards(player_two_cards)
+            player_two.add_cards(player_one_cards)
+            at_war = False
+
+        else:
+            print("War!")
+
+            if len(player_one.all_cards) < 5:
+                print("Player ONE unable to declare war")
+                print("PLAYER TWO WINS")
+                game_on = False
+                break
+
+            elif len(player_two.all_cards) < 5:
+                print("Player TWO unable to declare war")
+                print("PLAYER ONE WINS")
+                game_on = False
+                break
+
+            else:
+                for num in range(5):
+                    player_one_cards.append(player_one.remove_one())
+                    player_two_cards.append(player_two.remove_one())
